@@ -1,0 +1,201 @@
+---
+title: "Social Media Usage and Well-being"
+author: "NISHA MANDAL"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This report analyzes the relationship between social media usage and
+lifestyle/well-being indicators such as screen time, sleep, loneliness,
+and job satisfaction, using a survey dataset of working adults.
+
+---
+
+## 1. Data Importing
+
+```{r}
+# Read the CSV file into R (must be in the same folder as this .Rmd file)
+social_data <- read.csv("mental_health.csv")
+
+# Preview the first few rows
+head(social_data)
+```
+
+**Explanation:** `read.csv()` loads the dataset into a data frame called
+`social_data`. `head()` shows the first 6 rows so we can confirm it loaded
+correctly.
+
+---
+
+## 2. Data Structure and Overview
+
+```{r}
+str(social_data)
+```
+
+```{r}
+summary(social_data[, c("Age", "Screen_Time_Hours_Day", "Social_Media_Hours_Day",
+                         "Sleep_Hours_Night", "Loneliness", "Job_Satisfaction")])
+```
+
+**Explanation:** `str()` shows the data type of every column in the full
+dataset. `summary()` is applied only to the columns relevant to our topic
+(age, screen time, social media hours, sleep, loneliness, and job
+satisfaction) to keep the focus on social media and well-being.
+
+---
+
+## 3. Data Preprocessing and Cleaning
+
+```{r}
+# Check for missing values in the columns we care about
+colSums(is.na(social_data[, c("Age", "Gender", "Screen_Time_Hours_Day",
+                               "Social_Media_Hours_Day", "Sleep_Hours_Night",
+                               "Loneliness", "Job_Satisfaction")]))
+```
+
+```{r}
+# Check for duplicate rows
+sum(duplicated(social_data))
+```
+
+**Explanation:** `colSums(is.na(...))` counts missing values in our
+relevant columns. We also check for duplicate rows to ensure data quality.
+This dataset does not require date conversion since it is a one-time survey
+(no time-series column).
+
+---
+
+## 4. Data Analysis and Statistical Exploration
+
+```{r}
+# Gender distribution among respondents
+table(social_data$Gender)
+```
+
+```{r}
+# Central tendency and spread of daily social media usage (hours)
+median(social_data$Social_Media_Hours_Day)
+var(social_data$Social_Media_Hours_Day)
+sd(social_data$Social_Media_Hours_Day)
+```
+
+```{r}
+# Average social media usage by gender
+usage_by_gender <- aggregate(Social_Media_Hours_Day ~ Gender, data = social_data, mean)
+usage_by_gender
+```
+
+```{r}
+# Correlation between social media usage and loneliness
+cor(social_data$Social_Media_Hours_Day, social_data$Loneliness)
+```
+
+```{r}
+# Correlation between social media usage and sleep hours
+cor(social_data$Social_Media_Hours_Day, social_data$Sleep_Hours_Night)
+```
+
+```{r}
+# Correlation between screen time and job satisfaction
+cor(social_data$Screen_Time_Hours_Day, social_data$Job_Satisfaction)
+```
+
+**Explanation:** `table()` shows how many respondents fall into each
+gender category. `median()`, `var()`, and `sd()` describe how spread out
+daily social media usage is across respondents. `aggregate()` compares
+average usage between genders. `cor()` checks whether higher social media
+usage relates to loneliness or reduced sleep, and whether general screen
+time relates to job satisfaction.
+
+---
+
+## 5. Graphs and Plots
+
+```{r}
+# Pie chart: gender distribution
+gender_counts <- table(social_data$Gender)
+
+pie(
+  gender_counts,
+  main = "Gender Distribution of Respondents",
+  labels = paste(names(gender_counts), gender_counts)
+)
+```
+
+```{r}
+# Bar chart: average social media usage by gender
+barplot(
+  usage_by_gender$Social_Media_Hours_Day,
+  names.arg = usage_by_gender$Gender,
+  main = "Average Daily Social Media Usage by Gender",
+  xlab = "Gender",
+  ylab = "Hours per Day",
+  col = "steelblue"
+)
+```
+
+```{r}
+# Scatter plot: Social media usage vs Loneliness
+plot(
+  social_data$Social_Media_Hours_Day,
+  social_data$Loneliness,
+  main = "Social Media Usage vs Loneliness",
+  xlab = "Social Media Hours per Day",
+  ylab = "Loneliness Score",
+  pch = 19,
+  col = "darkgreen"
+)
+```
+
+```{r}
+# Scatter plot: Social media usage vs Sleep hours
+plot(
+  social_data$Social_Media_Hours_Day,
+  social_data$Sleep_Hours_Night,
+  main = "Social Media Usage vs Sleep Hours",
+  xlab = "Social Media Hours per Day",
+  ylab = "Sleep Hours per Night",
+  pch = 19,
+  col = "darkorange"
+)
+```
+
+**Explanation:** The pie chart shows the gender split of respondents. The
+bar chart compares average social media usage between genders. The two
+scatter plots visualize whether more social media use relates to higher
+loneliness or reduced sleep.
+
+---
+
+## 6. Findings and Conclusion
+
+*(Fill this in after running the chunks above and looking at your actual
+numbers/plots — a few example points to build on:)*
+
+- The average respondent spends **[X]** hours per day on social media,
+  with a standard deviation of **[X]**, showing [wide/narrow] variation
+  across individuals.
+- **[Gender]** respondents reported [higher/lower] average social media
+  usage than **[other gender]**.
+- The correlation between social media usage and loneliness was **[value]**,
+  indicating a [strong/moderate/weak] relationship — meaning more time on
+  social media [does/does not] clearly relate to feeling lonelier.
+- The correlation between social media usage and sleep hours was **[value]**,
+  suggesting that higher usage [does/does not] noticeably reduce sleep.
+- The correlation between screen time and job satisfaction was **[value]**,
+  showing a [strong/moderate/weak] relationship between overall screen time
+  and how satisfied people feel at work.
+
+**Conclusion:** This analysis explored how social media usage relates to
+well-being indicators like loneliness and sleep. While some relationships
+were observed, correlation alone cannot establish that social media use
+directly causes these outcomes — other lifestyle and personal factors
+likely also play a role. Further research with controlled variables would
+be needed to draw stronger conclusions.
